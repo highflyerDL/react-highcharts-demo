@@ -1,63 +1,92 @@
 import React, { Component } from 'react';
-import ReactHighcharts from 'react-highcharts';
-import {callQueryParamsApi} from "../util/callApi";
+import Dialog from 'material-ui/Dialog';
+import NavBar from "./NavBar";
+import Snackbar from 'material-ui/Snackbar';
+import FlatButton from "material-ui/FlatButton";
 
-class Main extends Component {
+export default class Main extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            config: {
-                chart: {
-                    type: 'line' 
-                },
-                title: {
-                    text: 'Zelsinki Lambda'
-                },
-                xAxis: {
-                    type: 'datetime'
-                },
-                plotOptions: {
-                    spline: {
-                        marker: {
-                            enabled: true
-                        }
-                    }
-                },
-                series: []
+            dialog: {
+                title: "",
+                open: false,
+                actions: [],
+                content: null
+            },
+            snackbar: {
+                content: "",
+                open: false,
+                action: null
             }
         };
-        callQueryParamsApi("",{type:"temperature"}).then((data) => {
-            data.forEach(obj=>{
+        this.onShowDialog = this.onShowDialog.bind(this);
+        this.onShowSnackbar = this.onShowSnackbar.bind(this);
+        this.handleDialogClose = this.handleDialogClose.bind(this);
+        this.handleSnackbarClose = this.handleSnackbarClose.bind(this);
 
-            });
-            data.forEach(obj=>{
-                var dateObj = new Date(obj.created);
-                obj.created = dateObj.getTime();
-                obj.value = parseFloat(obj.value, 10);
-                var isNew = true;
-                for(var i = 0; i<this.state.config.series.length;i++){
-                    var seri = this.state.config.series[i];
-                    if(seri.name == obj.sensorid){
-                        seri.data.push([obj.created, obj.value]);
-                        isNew = false;
-                    }
-                }
-                if(isNew){
-                    this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]]});
-                }
-            });
-            console.log(this.state.config);
-            this.setState(this.state);
-        });
+        this.defaultActions = [
+            <FlatButton label="Cancel" primary={true} onTouchTap={this.handleDialogClose}/>
+        ];
+    }
+
+    handleDialogClose() {
+        this.state.dialog.open = false;
+        this.setState(this.state);
+    }
+
+    handleSnackbarClose(reason) {
+        if (reason === "clickaway") {
+            return;
+        }
+        this.state.snackbar.open = false;
+        this.setState(this.state);
+    }
+
+    onShowDialog(dialog, isClose) {
+        if (isClose) {
+            dialog.open = false;
+            this.setState({dialog: dialog});
+            return;
+        }
+        dialog.open = true;
+        if (dialog.actions) {
+            dialog.actions.push(this.defaultActions);
+        } else {
+            dialog.actions = this.defaultActions;
+        }
+        this.setState({dialog: dialog});
+    }
+
+    onShowSnackbar(snackbar) {
+        console.log("in show");
+        snackbar.open = true;
+        this.setState({snackbar: snackbar})
     }
 
     render() {
         return (
             <div>
-                <ReactHighcharts config={this.state.config}></ReactHighcharts>
+                <NavBar showDialog={this.onShowDialog}/>
+                {this.props.children && React.cloneElement(this.props.children, {
+                    showSnackbar: this.onShowSnackbar,
+                    showDialog: this.onShowDialog
+                })}
+                <Dialog title={this.state.dialog.title}
+                        actions={this.state.dialog.actions}
+                        modal={false}
+                        open={this.state.dialog.open}
+                        onRequestClose={this.handleDialogClose}>
+                    {this.state.dialog.content}
+                </Dialog>
+                <Snackbar
+                    action={this.state.snackbar.action}
+                    open={this.state.snackbar.open}
+                    message={this.state.snackbar.content}
+                    autoHideDuration={this.state.snackbar.duration}
+                    onRequestClose={this.handleSnackbarClose}
+                    />
             </div>
         )
     }
 }
-
-export default Main;
