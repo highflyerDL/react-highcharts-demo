@@ -14,6 +14,9 @@ export default class Main extends Component {
                 content: null
             }
         };
+        this.configs = {
+            isLoading : false
+        };
         this.onShowDialog = this.onShowDialog.bind(this);
         this.handleDialogClose = this.handleDialogClose.bind(this);
 
@@ -25,6 +28,10 @@ export default class Main extends Component {
     handleDialogClose() {
         this.state.dialog.open = false;
         this.setState(this.state);
+    }
+
+    getChildContext() {
+        return {configs: this.configs};
     }
 
     onShowDialog(dialog, isClose) {
@@ -61,3 +68,7 @@ export default class Main extends Component {
         )
     }
 }
+
+Main.childContextTypes = {
+  configs: React.PropTypes.object
+};

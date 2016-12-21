@@ -24,6 +24,9 @@ class NavBar extends Component {
     }
 
     handleToggle() {
+        if(this.context.configs.isLoading){
+            return;
+        }
         this.setState({openDrawer: !this.state.openDrawer});
     }
 
@@ -74,5 +77,7 @@ class NavBar extends Component {
         )
     }
 }
-
+NavBar.contextTypes = {
+  configs: React.PropTypes.object
+};
 export default NavBar;

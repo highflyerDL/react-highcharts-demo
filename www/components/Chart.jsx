@@ -14,7 +14,13 @@ class Chart extends Component {
             dataType: "temperature",
             config: {
                 chart: {
-                    type: 'line' 
+                    type: 'line',
+                    events: {
+                        load: () => {
+                            console.log("inevent",this.state.config.series);
+                            this.pollingTimer = setInterval(this.update, 10000);
+                        }
+                    }
                 },
                 title: {
                     text: ''
@@ -35,9 +41,11 @@ class Chart extends Component {
                 content: "",
                 open: false,
                 action: null
-            }
+            },
+            from: ""
         };
         this.getData = this.getData.bind(this);
+        this.update = this.update.bind(this);
         this.handleSnackbarClose = this.handleSnackbarClose.bind(this);
         this.onShowSnackbar = this.onShowSnackbar.bind(this);
     }
@@ -45,16 +53,22 @@ class Chart extends Component {
     componentWillMount(){
         var type = this.props.params.type;
         if(dataTypes.indexOf(type)!=-1){
+            this.state.config.dataType = type;
             this.getData(type);
         } else {
             browserHistory.push("/notfound");
         }
     }
 
+    componentWillUnmount(){
+        clearInterval(this.pollingTimer);
+    }
+
     componentWillReceiveProps(nextProps){
         var type = nextProps.params.type;
         if(dataTypes.indexOf(type)!=-1){
-            this.getData(type);
+            this.state.config.dataType = type;
+            this.getData();
         } else {
             browserHistory.push("/notfound");
         }
@@ -69,16 +83,18 @@ class Chart extends Component {
     }
 
     onShowSnackbar(snackbar) {
-        console.log("in show");
         snackbar.open = true;
         this.setState({snackbar: snackbar})
     }
 
-    getData(dataType){
+    getData(){
+        this.state.config.title.text = this.state.config.dataType.toUpperCase();
         this.state.config.series = [];
-        this.state.config.title.text = dataType.toUpperCase();
+        this.state.from = "";
         this.onShowSnackbar(loadingSnackbar());
-        callQueryParamsApi("",{type:dataType}).then((data) => {
+        this.context.configs.isLoading = true;
+        callQueryParamsApi("",{type:this.state.config.dataType, from: this.state.from}).then((data) => {
+            this.state.from = data[data.length-1].created;
             data.forEach(obj=>{
                 var dateObj = new Date(obj.created);
                 obj.created = dateObj.getTime();
@@ -95,16 +111,42 @@ class Chart extends Component {
                     this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]]});
                 }
             });
-            // this.onShowSnackbar(callbackSnackbar("Retrieved !"));
+            this.onShowSnackbar(callbackSnackbar("Retrieved !"));
+            this.context.configs.isLoading = false;
             console.log(this.state.config);
             this.setState(this.state);
+        });
+    }
+
+    update(){
+        callQueryParamsApi("",{type:this.state.config.dataType, from: this.state.from}).then((data) => {
+            this.state.from = data[data.length-1].created;
+            let chart = this.refs.chart.getChart();
+            data.forEach(obj=>{
+                var dateObj = new Date(obj.created);
+                obj.created = dateObj.getTime();
+                obj.value = parseFloat(obj.value, 10);
+                var isNew = true;
+                for(var i = 0; i<this.state.config.series.length;i++){
+                    var seri = this.state.config.series[i];
+                    if(seri.name == obj.sensorid){
+                        chart.series[i].addPoint([obj.created, obj.value]);
+                        isNew = false;
+                    }
+                }
+                if(isNew){
+                    chart.addSeries({name:obj.sensorid, data: [[obj.created, obj.value]]});
+                }
+            });
+            // this.onShowSnackbar(callbackSnackbar("Retrieved !"));
+            this.context.configs.isLoading = false;
         });
     }
 
     render() {
         return (
             <div>
-                <ReactHighcharts config={this.state.config}></ReactHighcharts>
+                <ReactHighcharts config={this.state.config} ref="chart"></ReactHighcharts>
                 <Snackbar
                     action={this.state.snackbar.action}
                     open={this.state.snackbar.open}
@@ -116,5 +158,7 @@ class Chart extends Component {
         )
     }
 }
-
+Chart.contextTypes = {
+  configs: React.PropTypes.object
+};
 export default Chart;
