@@ -5,7 +5,7 @@ import { browserHistory } from 'react-router';
 import {callbackSnackbar, loadingSnackbar} from "../util/snackbarFactory";
 import Snackbar from 'material-ui/Snackbar';
 
-const dataTypes = ["temperature", "light"];
+const dataTypes = ["temperature", "light", "sound"];
 
 class Chart extends Component {
     constructor(props) {
@@ -95,7 +95,7 @@ class Chart extends Component {
                     this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]]});
                 }
             });
-            this.onShowSnackbar(callbackSnackbar("Retrieved !"));
+            // this.onShowSnackbar(callbackSnackbar("Retrieved !"));
             console.log(this.state.config);
             this.setState(this.state);
         });

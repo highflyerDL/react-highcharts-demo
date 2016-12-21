@@ -24,7 +24,6 @@ class NavBar extends Component {
     }
 
     handleToggle() {
-        console.log("in");
         this.setState({openDrawer: !this.state.openDrawer});
     }
 
@@ -67,8 +66,9 @@ class NavBar extends Component {
                         docked={false}
                         onRequestChange={(openDrawer) => this.setState({openDrawer})}>
                     <div className="upper-drawer" onTouchTap={this.handleToggle}>ZelsinkiLambda</div>
-                    <Link to="/sensors/temperature"><MenuItem>Temperature</MenuItem></Link>
-                    <Link to="/sensors/light"><MenuItem>Light</MenuItem></Link>
+                    <Link to="/sensors/temperature"><MenuItem onTouchTap={this.handleToggle}>Temperature</MenuItem></Link>
+                    <Link to="/sensors/light"><MenuItem onTouchTap={this.handleToggle}>Light</MenuItem></Link>
+                    <Link to="/sensors/sound"><MenuItem onTouchTap={this.handleToggle}>Sound</MenuItem></Link>
                 </Drawer>
             </div>
         )
