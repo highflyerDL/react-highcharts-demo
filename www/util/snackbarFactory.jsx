@@ -11,7 +11,7 @@ const loadingSnackbar = () => {
 const callbackSnackbar = (content) => {
   return {
     content : content,
-    duration: 2000
+    duration: 700
   }
 };
 

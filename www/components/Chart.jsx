@@ -3,6 +3,7 @@ import ReactHighcharts from 'react-highcharts';
 import {callQueryParamsApi} from "../util/callApi";
 import { browserHistory } from 'react-router';
 import {callbackSnackbar, loadingSnackbar} from "../util/snackbarFactory";
+import Snackbar from 'material-ui/Snackbar';
 
 const dataTypes = ["temperature", "light"];
 
@@ -29,12 +30,19 @@ class Chart extends Component {
                     }
                 },
                 series: []
+            },
+            snackbar: {
+                content: "",
+                open: false,
+                action: null
             }
         };
         this.getData = this.getData.bind(this);
+        this.handleSnackbarClose = this.handleSnackbarClose.bind(this);
+        this.onShowSnackbar = this.onShowSnackbar.bind(this);
     }
 
-    componentDidMount(){
+    componentWillMount(){
         var type = this.props.params.type;
         if(dataTypes.indexOf(type)!=-1){
             this.getData(type);
@@ -52,11 +60,24 @@ class Chart extends Component {
         }
     }
 
+    handleSnackbarClose(reason) {
+        if (reason === "clickaway") {
+            return;
+        }
+        this.state.snackbar.open = false;
+        this.setState(this.state);
+    }
+
+    onShowSnackbar(snackbar) {
+        console.log("in show");
+        snackbar.open = true;
+        this.setState({snackbar: snackbar})
+    }
+
     getData(dataType){
         this.state.config.series = [];
         this.state.config.title.text = dataType.toUpperCase();
-        // console.log("in",this.props.showSnackbar);
-        // this.props.showSnackbar(loadingSnackbar());
+        this.onShowSnackbar(loadingSnackbar());
         callQueryParamsApi("",{type:dataType}).then((data) => {
             data.forEach(obj=>{
                 var dateObj = new Date(obj.created);
@@ -74,7 +95,7 @@ class Chart extends Component {
                     this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]]});
                 }
             });
-            // this.props.showSnackbar(callbackSnackbar("Retrieved !"));
+            this.onShowSnackbar(callbackSnackbar("Retrieved !"));
             console.log(this.state.config);
             this.setState(this.state);
         });
@@ -84,6 +105,13 @@ class Chart extends Component {
         return (
             <div>
                 <ReactHighcharts config={this.state.config}></ReactHighcharts>
+                <Snackbar
+                    action={this.state.snackbar.action}
+                    open={this.state.snackbar.open}
+                    message={this.state.snackbar.content}
+                    autoHideDuration={this.state.snackbar.duration}
+                    onRequestClose={this.handleSnackbarClose}
+                    />
             </div>
         )
     }

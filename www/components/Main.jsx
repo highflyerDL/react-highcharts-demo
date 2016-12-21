@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
 import NavBar from "./NavBar";
-import Snackbar from 'material-ui/Snackbar';
 import FlatButton from "material-ui/FlatButton";
 
 export default class Main extends Component {
@@ -13,17 +12,10 @@ export default class Main extends Component {
                 open: false,
                 actions: [],
                 content: null
-            },
-            snackbar: {
-                content: "",
-                open: false,
-                action: null
             }
         };
         this.onShowDialog = this.onShowDialog.bind(this);
-        this.onShowSnackbar = this.onShowSnackbar.bind(this);
         this.handleDialogClose = this.handleDialogClose.bind(this);
-        this.handleSnackbarClose = this.handleSnackbarClose.bind(this);
 
         this.defaultActions = [
             <FlatButton label="Cancel" primary={true} onTouchTap={this.handleDialogClose}/>
@@ -32,14 +24,6 @@ export default class Main extends Component {
 
     handleDialogClose() {
         this.state.dialog.open = false;
-        this.setState(this.state);
-    }
-
-    handleSnackbarClose(reason) {
-        if (reason === "clickaway") {
-            return;
-        }
-        this.state.snackbar.open = false;
         this.setState(this.state);
     }
 
@@ -58,18 +42,12 @@ export default class Main extends Component {
         this.setState({dialog: dialog});
     }
 
-    onShowSnackbar(snackbar) {
-        console.log("in show");
-        snackbar.open = true;
-        this.setState({snackbar: snackbar})
-    }
 
     render() {
         return (
             <div>
                 <NavBar showDialog={this.onShowDialog}/>
                 {this.props.children && React.cloneElement(this.props.children, {
-                    showSnackbar: this.onShowSnackbar,
                     showDialog: this.onShowDialog
                 })}
                 <Dialog title={this.state.dialog.title}
@@ -79,13 +57,6 @@ export default class Main extends Component {
                         onRequestClose={this.handleDialogClose}>
                     {this.state.dialog.content}
                 </Dialog>
-                <Snackbar
-                    action={this.state.snackbar.action}
-                    open={this.state.snackbar.open}
-                    message={this.state.snackbar.content}
-                    autoHideDuration={this.state.snackbar.duration}
-                    onRequestClose={this.handleSnackbarClose}
-                    />
             </div>
         )
     }
