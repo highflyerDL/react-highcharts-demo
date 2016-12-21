@@ -15,10 +15,11 @@ class Chart extends Component {
             config: {
                 chart: {
                     type: 'line',
+                    zoomType: 'x',
                     events: {
                         load: () => {
                             console.log("inevent",this.state.config.series);
-                            this.pollingTimer = setInterval(this.update, 10000);
+                            this.pollingTimer = setInterval(this.update, 3000);
                         }
                     }
                 },
@@ -90,7 +91,7 @@ class Chart extends Component {
     getData(){
         this.state.config.title.text = this.state.config.dataType.toUpperCase();
         this.state.config.series = [];
-        this.state.from = "";
+        this.state.from = "2016-12-21T11:00:00.000Z";
         this.onShowSnackbar(loadingSnackbar());
         this.context.configs.isLoading = true;
         callQueryParamsApi("",{type:this.state.config.dataType, from: this.state.from}).then((data) => {
@@ -108,7 +109,7 @@ class Chart extends Component {
                     }
                 }
                 if(isNew){
-                    this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]]});
+                    this.state.config.series.push({name:obj.sensorid, data: [[obj.created, obj.value]], visible: false});
                 }
             });
             this.onShowSnackbar(callbackSnackbar("Retrieved !"));
