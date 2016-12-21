@@ -26,16 +26,16 @@ var webpackConfig = {
       }
     ]
   },
-  // plugins: PROD ? [
-  //   new webpack.optimize.UglifyJsPlugin({
-  //     compress: { warnings: false }
-  //   }),
-  //   new webpack.DefinePlugin({
-  //     'process.env':{
-  //       'NODE_ENV': JSON.stringify('production')
-  //     }
-  //   }) 
-  //   ] : [],
+  plugins: PROD ? [
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false }
+    }),
+    new webpack.DefinePlugin({
+      'process.env':{
+        'NODE_ENV': JSON.stringify('production')
+      }
+    }) 
+    ] : [],
   resolve: {
     extensions: ['', '.js', '.jsx', '.css', '.scss'], // what file extensions babel looks for in imports
     root: path.resolve(__dirname), // absolute imports

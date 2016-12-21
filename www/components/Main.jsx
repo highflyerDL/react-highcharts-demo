@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Dialog from 'material-ui/Dialog';
-import NavBar from "./NavBar";
+import NavBar from "./Navbar";
 import FlatButton from "material-ui/FlatButton";
 
 export default class Main extends Component {
