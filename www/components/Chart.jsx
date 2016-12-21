@@ -18,7 +18,6 @@ class Chart extends Component {
                     zoomType: 'x',
                     events: {
                         load: () => {
-                            console.log("inevent",this.state.config.series);
                             this.pollingTimer = setInterval(this.update, 3000);
                         }
                     }
@@ -91,7 +90,9 @@ class Chart extends Component {
     getData(){
         this.state.config.title.text = this.state.config.dataType.toUpperCase();
         this.state.config.series = [];
-        this.state.from = "2016-12-21T11:00:00.000Z";
+        var now = new Date();
+        now.setHours(now.getHours()-1);
+        this.state.from = now.toISOString();;
         this.onShowSnackbar(loadingSnackbar());
         this.context.configs.isLoading = true;
         callQueryParamsApi("",{type:this.state.config.dataType, from: this.state.from}).then((data) => {
@@ -114,7 +115,6 @@ class Chart extends Component {
             });
             this.onShowSnackbar(callbackSnackbar("Retrieved !"));
             this.context.configs.isLoading = false;
-            console.log(this.state.config);
             this.setState(this.state);
         });
     }
