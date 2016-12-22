@@ -60,7 +60,7 @@ class NavBar extends Component {
         return (
             <div id="navbar">
                 <AppBar
-                    title="ZelsinkiLambda"
+                    title="EyeOfSauron"
                     iconClassNameRight="muidocs-icon-navigation-expand-more"
                     onLeftIconButtonTouchTap={this.handleToggle} onTitleTouchTap={this.handleToggle}>
                 </AppBar>
@@ -68,7 +68,7 @@ class NavBar extends Component {
                 <Drawer open={this.state.openDrawer}
                         docked={false}
                         onRequestChange={(openDrawer) => this.setState({openDrawer})}>
-                    <div className="upper-drawer" onTouchTap={this.handleToggle}>ZelsinkiLambda</div>
+                    <div className="upper-drawer" onTouchTap={this.handleToggle}>EyeOfSauron</div>
                     <Link to="/sensors/temperature"><MenuItem onTouchTap={this.handleToggle}>Temperature</MenuItem></Link>
                     <Link to="/sensors/light"><MenuItem onTouchTap={this.handleToggle}>Light</MenuItem></Link>
                     <Link to="/sensors/sound"><MenuItem onTouchTap={this.handleToggle}>Sound</MenuItem></Link>

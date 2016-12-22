@@ -91,7 +91,7 @@ class Chart extends Component {
         this.state.config.title.text = this.state.config.dataType.toUpperCase();
         this.state.config.series = [];
         var now = new Date();
-        now = new Date(now.getTime()-30*60000)
+        now = new Date(now.getTime()-10*60000)
         this.state.from = now.toISOString();;
         this.onShowSnackbar(loadingSnackbar());
         this.context.configs.isLoading = true;
